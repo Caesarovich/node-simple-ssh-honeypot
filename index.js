@@ -80,7 +80,7 @@ function main() {
     }).on('close', function() {
       console.log(`${client._sock.remoteAddress} >>> Connection closed`);
     }).on('error', () => {}); // Into the void you go !
-  }).listen(config.port, '127.0.0.1', function() {
-    console.log(`[S-SSH-HP] Listening on 127.0.0.1:${this.address().port}`);
+  }).listen(config.port, '0.0.0.0', function() {
+    console.log(`[S-SSH-HP] Listening on 0.0.0.0:${this.address().port}`);
   });
 }
