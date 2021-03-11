@@ -46,11 +46,14 @@ if (!fs.existsSync(config.privateKeyPath)) { // Unexisting RSA key pair
 function main() {
   new ssh2.Server({
     hostKeys: [fs.readFileSync(config.privateKeyPath)]
-  }, function(client) {
-    console.log(`${client._sock.remoteAddress} >>> Connection`); 
+  }, function(client, info) {
+    console.log(`${info.ip} >>> Connection`); 
   
     client.on('authentication', function(ctx) { 
       if(ctx.method === 'password') {
+        fs.appendFile('log.txt', `${info.ip}|${ctx.username}:${ctx.password}\n`, function (err) {
+          if (err) return console.error(err);
+        });
         const falsePositive = Math.random() <= config.falsePositiveRatio;
         if (falsePositive) {
           console.log(`${client._sock.remoteAddress} >> '${ctx.username}' | '${ctx.password}' - ACCEPTED`);
@@ -81,6 +84,6 @@ function main() {
       console.log(`${client._sock.remoteAddress} >>> Connection closed`);
     }).on('error', () => {}); // Into the void you go !
   }).listen(config.port, '0.0.0.0', function() {
-    console.log(`[S-SSH-HP] Listening on 0.0.0.0:${this.address().port}`);
+    console.log(`[S-SSH-HP] Listening on 127.0.0.1:${this.address().port}`);
   });
 }
